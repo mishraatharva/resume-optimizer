@@ -1,6 +1,6 @@
 # Resume Optimizer with Llamaindex
 
-![GIf](./demo.gif)
+![GIf](demo.gif)
 
 A powerful AI-powered resume optimization tool that helps job seekers enhance their resumes based on specific job requirements. Built with Streamlit and powered by Nebius AI, this application provides targeted suggestions to improve your resume's effectiveness.
 
