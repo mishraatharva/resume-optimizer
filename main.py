@@ -1,40 +1,36 @@
 import streamlit as st
 import os
 from llama_index.core import SimpleDirectoryReader, Settings, VectorStoreIndex
-from llama_index.embeddings.nebius import NebiusEmbedding
-from llama_index.llms.nebius import NebiusLLM
+from llama_index.llms.groq import Groq
+from llama_index.embeddings.fireworks import FireworksEmbedding
+from llama_index.embeddings.huggingface import HuggingFaceEmbedding
 from dotenv import load_dotenv
 import tempfile
 import shutil
 import base64
 from PyPDF2 import PdfReader
 import io
+from llama_index.core import Settings
 
 # Load environment variables
 load_dotenv()
 
-def run_rag_completion(
-    documents,
-    query_text: str,
-    job_title: str,
-    job_description: str,
-    embedding_model: str = "BAAI/bge-en-icl",
-    generative_model: str = "Qwen/Qwen3-235B-A22B"
-) -> str:
+def run_rag_completion(documents,query_text: str,job_title: str,job_description: str,generative_model: str) -> str:
     """Run RAG completion using Nebius models for resume optimization."""
     try:
-        llm = NebiusLLM(
-            model=generative_model,
-            api_key=os.getenv("NEBIUS_API_KEY")
-        )
+        llm = Groq(model=generative_model, api_key=os.getenv("GROQ_API_KEY"))
 
-        embed_model = NebiusEmbedding(
-            model_name=embedding_model,
-            api_key=os.getenv("NEBIUS_API_KEY")
+        # embeddings_model = FireworksEmbedding(
+        #     model="nomic-ai/nomic-embed-text-v1.5",
+        #     api_key=os.getenv("FIREWORKS_API_KEY")
+        # )
+
+        embeddings_model = HuggingFaceEmbedding(
+           model_name="BAAI/bge-small-en-v1.5"
         )
         
         Settings.llm = llm
-        Settings.embed_model = embed_model
+        Settings.embed_model = embeddings_model
         
         # Step 1: Analyze the resume
         analysis_prompt = f"""
@@ -64,19 +60,19 @@ def run_rag_completion(
         Optimization Request: {query_text}
         
         Provide a direct, structured response in this exact format:
-
+        
         ## Key Findings
         • [2-3 bullet points highlighting main alignment and gaps]
-
+        
         ## Specific Improvements
         • [3-5 bullet points with concrete suggestions]
         • Each bullet should start with a strong action verb
         • Include specific examples where possible
-
+        
         ## Action Items
         • [2-3 specific, immediate steps to take]
         • Each item should be clear and implementable
-
+        
         Keep all points concise and actionable. Do not include any thinking process or analysis.
         """
         
@@ -119,13 +115,12 @@ def main():
     with st.sidebar:
         st.image("./Nebius.png", width=150)
         
-        # Model selection
         generative_model = st.selectbox(
             "Generative Model",
-            ["Qwen/Qwen3-235B-A22B", "deepseek-ai/DeepSeek-V3"],
+            ["openai/gpt-oss-120b", "qwen/qwen3-32b"],
             index=0
         )
-        
+        #, "deepseek-ai/DeepSeek-V3"
         st.divider()
         
         # Resume upload
@@ -141,8 +136,8 @@ def main():
             if uploaded_file != st.session_state.current_pdf:
                 st.session_state.current_pdf = uploaded_file
                 try:
-                    if not os.getenv("NEBIUS_API_KEY"):
-                        st.error("Missing Nebius API key")
+                    if not os.getenv("GROQ_API_KEY") or not os.getenv("FIREWORKS_API_KEY"):
+                        st.error("Missing required API keys")
                         st.stop()
                     
                     # Create temporary directory for the PDF
@@ -212,7 +207,6 @@ def main():
                         prompts[optimization_type],
                         job_title,
                         job_description,
-                        "BAAI/bge-en-icl",
                         generative_model
                     )
                     # Remove think tags from response
@@ -229,4 +223,7 @@ def main():
             st.markdown(message["content"])
 
 if __name__ == "__main__":
+    embeddings_model = HuggingFaceEmbedding(
+    model_name="BAAI/bge-small-en-v1.5"
+    )
     main()

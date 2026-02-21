@@ -23,15 +23,15 @@ A powerful AI-powered resume optimization tool that helps job seekers enhance th
 
 - Python 3.10 or higher
 - PDF resume file
-- Create an account at [Nebius Token Factory](https://tokenfactory.nebius.com/)
-- Get Nebius [API Keys](https://tokenfactory.nebius.com/)
+- Create an account at [GROQ](https://groq.com/)
+- Get Groq API KEY [API Keys](https://groq.com/)
 
 ## Installation
 
 1. Clone the repository:
 
 ```bash
-git clone https://github.com/Arindam200/awesome-ai-apps.git
+git clone https://github.com/mishraatharva/resume-optimizer
 cd rag_apps/resume_optimizer
 ```
 
@@ -48,7 +48,7 @@ uv sync
 3. Create a `.env` file in the project root and add your Nebius API key:
 
 ```
-NEBIUS_API_KEY=your_api_key_here
+GROQ_API_KEY=your_api_key_here
 ```
 
 ## Usage
