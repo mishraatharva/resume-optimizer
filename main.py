@@ -109,11 +109,10 @@ def main():
     
     # Header
     st.title("📝 Resume Optimizer")
-    st.caption("Powered by Nebius AI")
+    st.caption("Powered by Groq")
     
     # Sidebar for configuration
     with st.sidebar:
-        st.image("./Nebius.png", width=150)
         
         generative_model = st.selectbox(
             "Generative Model",
